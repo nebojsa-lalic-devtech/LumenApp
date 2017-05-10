@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Employee;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class EmployeeController extends Controller
 {
@@ -30,6 +31,7 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = Employee::all();
+        Log::info('GET ALL EMPLOYEES FROM DATABASE');
         return response()->json($employees);
     }
 
@@ -37,6 +39,7 @@ class EmployeeController extends Controller
     public function getEmployee($id)
     {
         $employee = Employee::find($id);
+        Log::info('GET ALL EMPLOYEE WITH ID: ' . $id);
         return response()->json($employee);
     }
 
@@ -44,12 +47,12 @@ class EmployeeController extends Controller
     public function saveEmployee(Request $request)
     {
         $this->validate($request, [
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'email' => 'required',
+            'first_name' => 'required|max:50',
+            'last_name' => 'required|max:50',
+            'email' => 'required|email|unique:employees',
             'job' => 'required'
         ]);
-
+        Log::info('CREATE NEW EMPLOYEE IN DATABASE');
         $employee = Employee::create($request->all());
         return response()->json($employee);
     }
@@ -58,16 +61,14 @@ class EmployeeController extends Controller
     public function updateEmployee(Request $request, $id)
     {
         $employee = Employee::find($id);
-
         $this->validate($request, [
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'email' => 'required',
+            'first_name' => 'required|max:50',
+            'last_name' => 'required|max:50',
+            'email' => 'required|email|unique:employees',
             'job' => 'required'
         ]);
-
+        Log::info('UPDATED EMPLOYEE WITH ID: ' . $id);
         $employee->update($request->all());
-
         return response()->json($employee);
     }
 
@@ -76,6 +77,7 @@ class EmployeeController extends Controller
     {
         $employee = Employee::find($id);
         $employee->delete();
+        Log::info('DELETE EMPLOYEE WITH ID: ' . $id);
         return response()->json($employee);
     }
 }
